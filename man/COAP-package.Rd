@@ -9,11 +9,7 @@
 \packageDescription{COAP}
 }
 \details{
-
-The DESCRIPTION file:
-\packageDESCRIPTION{COAP}
-\packageIndices{COAP}
-~~ An overview of how to use the package, including the most important functions ~~
+The current Poisson factor models often assume that the factors are unknown, which overlooks the explanatory potential of certain observable covariates. This study focuses on high dimensional settings, where the number of the count response variables and/or covariates can diverge as the sample size increases. A covariate-augmented overdispersed Poisson factor model is proposed to jointly perform a high-dimensional Poisson factor analysis and estimate a large coefficient matrix for overdispersed count data. 
 }
 \author{
 \packageAuthor{COAP}
@@ -21,15 +17,12 @@ The DESCRIPTION file:
 Maintainer: \packageMaintainer{COAP}
 }
 \references{
-~~ Literature or other references for background information ~~
+  None
 }
 ~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation ~~
 ~~ directory ~~
 \keyword{ package }
 \seealso{
 ~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
-\examples{
-~~ simple examples of the most important functions ~~
+~~ \code{\link[<pkg>:<pkg>-package]{<GFM>}} ~~
 }

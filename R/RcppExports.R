@@ -6,7 +6,7 @@
 #' 
 NULL
 
-Reduced_Rank_COAP <- function(X_count, a, Z, rank_use, Mu_y_int, S_y_int, invLambda_int, B_int, bbeta_int, Mu_h_int, S_h_int, Sigma_h_int, epsELBO, maxIter, verbose, fast_version, sep_opt_beta, fast_svd = TRUE) {
-    .Call(`_COAP_Reduced_Rank_COAP`, X_count, a, Z, rank_use, Mu_y_int, S_y_int, invLambda_int, B_int, bbeta_int, Mu_h_int, S_h_int, Sigma_h_int, epsELBO, maxIter, verbose, fast_version, sep_opt_beta, fast_svd)
+Reduced_Rank_COAP <- function(X_count, a, Z, rank_use, Mu_y_int, S_y_int, invLambda_int, B_int, bbeta_int, H_int, epsELBO, maxIter, verbose, sep_opt_beta, fast_svd = TRUE) {
+    .Call(`_COAP_Reduced_Rank_COAP`, X_count, a, Z, rank_use, Mu_y_int, S_y_int, invLambda_int, B_int, bbeta_int, H_int, epsELBO, maxIter, verbose, sep_opt_beta, fast_svd)
 }
 
