@@ -13,7 +13,6 @@ RR_COAP(
   epsELBO = 1e-05,
   maxIter = 30,
   verbose = TRUE,
-  fast_version = c("Laplace_Taylor", "Rough_Approx"),
   joint_opt_beta = FALSE,
   fast_svd = TRUE
 )
@@ -48,9 +47,17 @@ Fit the covariate-augmented overdispersed Poisson factor model
 \details{
 None
 }
+\examples{
+n <- 300; p <- 100
+d <- 20; q <- 6; r <- 3
+datlist <- gendata_simu(n=n, p=p, d=20, q=q, rank0=r)
+str(datlist)
+fitlist <- RR_COAP(X_count=datlist$X, Z = datlist$Z, q=6, rank_use=3)
+str(fitlist)
+}
 \references{
-None
+Liu, W. and Q. Zhong (2024). High-dimensional covariate-augmented overdispersed poisson factor model. arXiv preprint arXiv:2402.15071.
 }
 \seealso{
-\code{\link{RR_COAP}}
+None
 }

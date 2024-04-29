@@ -12,7 +12,8 @@ gendata_simu(
   q = 6,
   rank0 = 3,
   rho = c(1.5, 1),
-  sigma2_eps = 0.1
+  sigma2_eps = 0.1,
+  seed.beta = 1
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ gendata_simu(
 \item{rho}{a numeric vector with length 2 and positive elements, specify the signal strength of regression coefficient and loading matrix, respectively.}
 
 \item{sigma2_eps}{a positive real, the variance of overdispersion error.}
+
+\item{seed.beta}{a postive integer, the random seed for reproducibility of data generation process by fixing the regression coefficient matrix beta.}
 }
 \value{
 return a list including the following components: (1) X, the high-dimensional count matrix; (2) Z, the high-dimensional covriate matrix; (3) bbeta0, the low-rank large coefficient matrix; (4) B0, the loading matrix; (5) H0, the factor matrix; (6) rank: the true rank of bbeta0; (7) q: the true number of factors.
@@ -40,6 +43,12 @@ Generate simulated data from covariate-augmented Poisson factor models
 }
 \details{
 None
+}
+\examples{
+n <- 300; p <- 100
+d <- 20; q <- 6; r <- 3
+datlist <- gendata_simu(n=n, p=p, d=20, q=q, rank0=r)
+str(datlist)
 }
 \references{
 None

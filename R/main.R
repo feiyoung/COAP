@@ -1,6 +1,6 @@
 # generate man files
 # devtools::document()
-# R CMD check --as-cran ProFAST_1.2.tar.gz
+# R CMD check --as-cran COAP_1.1.tar.gz
 ## usethis::use_data(dat_r2_mac)
 # pkgdown::build_site()
 # pkgdown::build_home()
@@ -20,19 +20,27 @@
 #' @param d a postive integer,  specify the dimension of covariate matrix.
 #' @param q a postive integer,  specify the number of factors.
 #' @param rank0 a postive integer, specify the rank of the coefficient matrix.
-#' @param rho a numeric vector with length 2 and positive elements, specify the signal strength of regression coefficient and loading matrix, respectively. 
+#' @param rho a numeric vector with length 2 and positive elements, specify the signal strength of loading matrix and regression coefficient, respectively. 
 #' @param sigma2_eps a positive real, the variance of overdispersion error.
+#' @param seed.beta a postive integer, the random seed for reproducibility of data generation process by fixing the regression coefficient matrix beta.
 #' @return return a list including the following components: (1) X, the high-dimensional count matrix; (2) Z, the high-dimensional covriate matrix; (3) bbeta0, the low-rank large coefficient matrix; (4) B0, the loading matrix; (5) H0, the factor matrix; (6) rank: the true rank of bbeta0; (7) q: the true number of factors.
 #' @details None
 #' @seealso \code{\link{RR_COAP}}
 #' @references None
 #' @export
 #' @importFrom  MASS mvrnorm
+#' @importFrom  stats cov lm residuals rnorm rpois
 #'
-#'
+#' @examples
+#' n <- 300; p <- 100
+#' d <- 20; q <- 6; r <- 3
+#' datlist <- gendata_simu(n=n, p=p, d=20, q=q, rank0=r)
+#' str(datlist)
 
-gendata_simu <-function (seed = 1, n = 300, p = 50, d=20, q = 6, rank0=3, rho = c(1.5, 1), sigma2_eps=0.1){
-  require(MASS)
+
+gendata_simu <-function (seed = 1, n = 300, p = 50, d=20, q = 6, rank0=3, 
+                         rho = c(1.5, 1), sigma2_eps=0.1, seed.beta=1){
+  #require(MASS)
   if(rank0<=1) stop("rank0 must be greater than 1!")
   cor.mat<-function (p, rho, type = "toeplitz") {
     if (p == 1) 
@@ -66,7 +74,7 @@ gendata_simu <-function (seed = 1, n = 300, p = 50, d=20, q = 6, rank0=3, rho = 
   
   factor_term <- rho[1]
   factor_term_z <- rho[2]
-  set.seed(1) # Fixed bbeta0
+  set.seed(seed.beta) # Fixed bbeta0
   #bbeta0 <- matrix(rnorm(p*d), p, d) 
   rank_true <- rank0 - 1
   bbeta0 <- t(matrix(rnorm(d*rank_true), d, rank_true) %*% matrix(rnorm(rank_true* p), rank_true, p)) / p *4 * factor_term_z
@@ -210,13 +218,21 @@ add_identifiability <- function(H, B){
 #' @param fast_svd a logical value, whether use the fast SVD algorithm in the update of bbeta; default is \code{TRUE}.
 #' @return return a list including the following components: (1) H, the predicted factor matrix; (2) B, the estimated loading matrix; (3) bbeta, the estimated low-rank large coefficient matrix; (4) invLambda, the inverse of the estimated variances of error; (5) H0, the factor matrix; (6) ELBO: the ELBO value when algorithm stops; (7) ELBO_seq: the sequence of ELBO values.
 #' @details None
-#' @seealso \code{\link{RR_COAP}}
-#' @references None
+#' @seealso None
+#' @references Liu, W. and Q. Zhong (2024). High-dimensional covariate-augmented overdispersed poisson factor model. arXiv preprint arXiv:2402.15071.
 #' @export
 #' @useDynLib COAP, .registration = TRUE
 #' @importFrom  irlba irlba
 #' @importFrom  Rcpp evalCpp
 #'
+#'
+#' @examples
+#' n <- 300; p <- 100
+#' d <- 20; q <- 6; r <- 3
+#' datlist <- gendata_simu(n=n, p=p, d=20, q=q, rank0=r)
+#' str(datlist)
+#' fitlist <- RR_COAP(X_count=datlist$X, Z = datlist$Z, q=6, rank_use=3)
+#' str(fitlist)
 RR_COAP <- function(X_count, multiFac=rep(1, nrow(X_count)), Z=matrix(1, nrow(X_count),1),
                     rank_use=5, q=15, epsELBO=1e-5, 
                     maxIter=30, verbose=TRUE,
@@ -225,7 +241,7 @@ RR_COAP <- function(X_count, multiFac=rep(1, nrow(X_count)), Z=matrix(1, nrow(X_
   # Z=NULL; q=15; epsELBO=1e-6;  maxIter=10; verbose=TRUE
   
   get_initials <- function(X, q){
-    require(irlba)
+    #require(irlba)
     n <- nrow(X); p <- ncol(X)
     mu <- colMeans(X)
     X <- X - matrix(mu, nrow=n, ncol=p, byrow=TRUE)
@@ -246,7 +262,6 @@ RR_COAP <- function(X_count, multiFac=rep(1, nrow(X_count)), Z=matrix(1, nrow(X_
   Mu_y_int = log(1+ X_count)#matrix(1, n, p);
   S_y_int = matrix(1, n, p);
   a <- multiFac
-  set.seed(1)
   fit_approxPCA <- get_initials(Mu_y_int, q=q)
   B_int <- fit_approxPCA$hB
   Mu_h_int <-  fit_approxPCA$hH
@@ -278,10 +293,8 @@ RR_COAP <- function(X_count, multiFac=rep(1, nrow(X_count)), Z=matrix(1, nrow(X_
 #' @param q_max an optional string, specify the upper bound for the number of factors; default as 15.
 #' @param r_max an optional integer, specify the upper bound for the rank of the regression coefficient matrix; default as 24.
 #' @param threshold  an optional 2-dimensional positive vector, specify the the thresholds that filters the singular values of beta and B, respectively.
-#' @param maxIter the maximum iteration of the VEM algorithm. The default is 30.
 #' @param verbose a logical value, whether output the information in iteration.
-#' @param joint_opt_beta a logical value, whether use the joint optimization method to update bbeta. The default is \code{FALSE}, which means using the separate optimization method.
-#' @param fast_svd a logical value, whether use the fast SVD algorithm in the update of bbeta; default is \code{TRUE}.
+#' @param ..., other arguments passed to the function \code{\link{RR_COAP}}.
 #' @return return a named vector with names `hr` and `hq`, the estimated rank and number of factors.
 #' @details The threshold is to filter the singular values with  low signal, to assist the identification of underlying model structure.
 #' @seealso \code{\link{RR_COAP}}
@@ -289,12 +302,21 @@ RR_COAP <- function(X_count, multiFac=rep(1, nrow(X_count)), Z=matrix(1, nrow(X_
 #' @export
 #'
 #'
+#'
+#' @examples
+#' n <- 300; p <- 200
+#' d <- 20; q <- 6; r <- 3
+#' datlist <- gendata_simu(n=n, p=p, d=20, q=q, rank0=r, rho=c(1,4))
+#' str(datlist)
+#' set.seed(1)
+#' para_vec <- selectParams(X_count=datlist$X, Z = datlist$Z)
+#' print(para_vec)
 
 selectParams <- function(X_count, Z, multiFac=rep(1, nrow(X_count)), 
                          q_max=15, r_max=24,
                          threshold=c(1e-1, 1e-2),verbose=TRUE, ...){
   
-  reslist <- RR_COAP(X_count, Z = datList$Z,multiFac=multiFac, rank_use = r_max, q= q_max,
+  reslist <- RR_COAP(X_count, Z = Z,multiFac=multiFac, rank_use = r_max, q= q_max,
                      verbose=verbose,...)
   
   thre1 <- threshold[1]

@@ -20,14 +20,14 @@ This vignette introduces the usage of COAP for the analysis of high-dimensional 
 
 
 The package can be loaded with the command:
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 library(COAP)
 library(GFM)
 ```
 
 ## Generate the simulated data
 First, we generate the data simulated data. 
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 n <- 200; p <- 200; 
 d= 50
 rank0 <- 6;
@@ -40,7 +40,7 @@ bbeta0 <- cbind( datList$mu0, datList$bbeta0)
 
 ```
 Fit the COAP model using the function `RR_COAP()` in the R package `COAP`. Users can use `?RR_COAP` to see the details about this function
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 hq <- 5; hr <- 6
 system.time({
   tic <- proc.time()
@@ -52,7 +52,7 @@ system.time({
 
 
 Check the increased property of the envidence lower bound function.
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 library(ggplot2)
 dat_iter <- data.frame(iter=1:length(reslist$ELBO_seq), ELBO=reslist$ELBO_seq)
 ggplot(data=dat_iter, aes(x=iter, y=ELBO)) + geom_line() + geom_point() + theme_bw(base_size = 20)
@@ -60,7 +60,7 @@ ggplot(data=dat_iter, aes(x=iter, y=ELBO)) + geom_line() + geom_point() + theme_
 ```
 
 We calculate the metrics to measure the estimatioin accuracy, where the trace statistic is used to measure the estimation accuracy of loading matrix and prediction accuracy of factor matrix, which is evaluated by the function `measurefun()` in the R package `GFM`, and the root of mean square error is adopted to measure the estimation error of bbeta.
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 library(GFM)
 metricList <- list()
 metricList$COAP <- list()
@@ -80,7 +80,7 @@ We compare COAP with various prominent methods in the literature. They are (1) H
 
 (1). First, we implemented the linear factor model (LFM) and record the metrics that measure the estimation accuracy and computational cost.
 
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 metricList$LFM <- list()
 tic <- proc.time()
 fit_lfm <- Factorm(X_count, q=q)
@@ -96,7 +96,7 @@ metricList$LFM$Time <- time_lfm
 ```
 
 (2). Then, we implemented PoissonPCA and recorded the metrics.
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 metricList$PoissonPCA <- list()
 library(PoissonPCA)
 tic <- proc.time()
@@ -135,7 +135,7 @@ metricList$PoissonPCA$Time <- time_zipfa
 ```
 (4) Fourthly, we also applied the generalized factor model to estimate the loading matrix and factor matrix.
 
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 metricList$GFM <- list()
 tic <- proc.time()
 fit_gfm <- gfm(list(X_count),  type='poisson', q= q, verbose = F)
@@ -151,7 +151,7 @@ metricList$GFM$Time <- time_gfm
 
 
 (5) Fifthly,  we implemented PLNPCA:
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 PLNPCA_run <- function(X_count, covariates, q,  Offset=rep(1, nrow(X_count))){
   require(PLNmodels)
  
@@ -217,7 +217,7 @@ metricList$GLLVM$Time <- time_gllvm
 ```
 
 (7) Seventhly, Poisson regression model for each variable was implemented.
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 PoisReg <- function(X_count, covariates){
      library(stats)
      hbbeta <- apply(X_count, 2, function(x){
@@ -241,7 +241,7 @@ metricList$GLM$Time <- time_poisreg
 
 (8) Eightly, we implemented the first version of multi-response reduced-rank Poisson regression model (MMMR, Luo et al. 2018) implemented in rrpack R package (MRRR-Z), that did not consider the latent factor structure but only the covariates.
 
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 mrrr_run <- function(Y, X, rank0, q=NULL, family=list(poisson()), familygroup=rep(1,ncol(Y))){
   
   
@@ -287,7 +287,7 @@ metricList$MRRR_Z$Time <- time_mrrrz
 ```
 (9) Lastly, we implemented the second version of MRRR (MRRR-F) that  considered both  covariates and the latent factor structure.
 
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 tic <- proc.time()
 res_mrrrf <- mrrr_run(X_count, Z, rank0, q=q)
 toc <- proc.time()
@@ -306,7 +306,7 @@ metricList$MRRR_F$Time <- time_mrrrf
 ## Visualize the comparison of performance
 
 Next, we summarized the metrics for COAP and other compared methods in a dataframe object.
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 list2vec <- function(xlist){
   nn <- length(xlist)
   me <- rep(NA, nn)
@@ -324,7 +324,7 @@ dat_metric
 ```
 
 Plot the results for COAP and other methods, which suggests that COAP achieves better estimation accuracy for the quantiites of interest.
-```{r  eval = TRUE, fig.width=9, fig.height=6}
+```{r  eval = FALSE, fig.width=9, fig.height=6}
 library(cowplot)
 p1 <- ggplot(data=subset(dat_metric, !is.na(Tr_B)), aes(x= Method, y=Tr_B, fill=Method)) + geom_bar(stat="identity") + xlab(NULL) + scale_x_discrete(breaks=NULL) + theme_bw(base_size = 16)
 p2 <- ggplot(data=subset(dat_metric, !is.na(Tr_H)), aes(x= Method, y=Tr_H, fill=Method)) + geom_bar(stat="identity") + xlab(NULL) + scale_x_discrete(breaks=NULL)+ theme_bw(base_size = 16)
@@ -337,7 +337,7 @@ plot_grid(p1,p2,p3, p4, nrow=2, ncol=2)
 ## Select the parameters
 
 We applied the singular value ratio based method to select the number of factors and the rank of coefficient matrix. The results showed that  the SVR method has the potential to identify the true values.
-```{r  eval = TRUE}
+```{r  eval = FALSE}
 datList <- gendata_simu(seed = 1, n=n, p=p, d= d, rank0 = rank0, q= q, rho=c(3, 6),
                         sigma2_eps = 1)
 X_count <- datList$X; Z <- datList$Z

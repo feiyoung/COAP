@@ -30,11 +30,7 @@ selectParams(
 
 \item{verbose}{a logical value, whether output the information in iteration.}
 
-\item{maxIter}{the maximum iteration of the VEM algorithm. The default is 30.}
-
-\item{joint_opt_beta}{a logical value, whether use the joint optimization method to update bbeta. The default is \code{FALSE}, which means using the separate optimization method.}
-
-\item{fast_svd}{a logical value, whether use the fast SVD algorithm in the update of bbeta; default is \code{TRUE}.}
+\item{..., }{other arguments passed to the function \code{\link{RR_COAP}}.}
 }
 \value{
 return a named vector with names `hr` and `hq`, the estimated rank and number of factors.
@@ -44,6 +40,15 @@ Select the number of factors and the rank of coefficient matrix in the covariate
 }
 \details{
 The threshold is to filter the singular values with  low signal, to assist the identification of underlying model structure.
+}
+\examples{
+n <- 300; p <- 100
+d <- 20; q <- 6; r <- 3
+datlist <- gendata_simu(seed=30, n=n, p=p, d=20, q=q, rank0=r)
+str(datlist)
+set.seed(1)
+para_vec <- selectParams(X_count=datlist$X, Z = datlist$Z)
+print(para_vec)
 }
 \references{
 None
