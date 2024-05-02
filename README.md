@@ -14,15 +14,18 @@ The current Poisson factor models often assume that the factors are unknown, whi
 
 
 
-Check out  our [Package Website](https://feiyoung.github.io/COAP/index.html) for a more complete description of the methods and analyses. 
+Check out  our [Biometric paper](https://doi.org/10.1093/biomtc/ujae031) and  [Package Website](https://feiyoung.github.io/COAP/index.html) for a more complete description of the methods and analyses. 
 
 # Installation
 "COAP" depends on the 'Rcpp' and 'RcppArmadillo' package, which requires appropriate setup of computer. For the users that have set up system properly for compiling C++ files, the following installation command will work.
 ```{Rmd}
-
+## Method 1：
 if (!require("remotes", quietly = TRUE))
     install.packages("remotes")
 remotes::install_github("feiyoung/COAP")
+
+## Method 2: install from CRAN
+install.packages("COAP")
 
 ```
 
