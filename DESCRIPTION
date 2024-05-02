@@ -1,8 +1,8 @@
 Package: COAP
 Type: Package
 Title: High-Dimensional Covariate-Augmented Overdispersed Poisson Factor Model
-Version: 1.1
-Date: 2024-02-28
+Version: 1.2
+Date: 2024-05-02
 Authors@R: 
     c(person(given = "Wei",
              family = "Liu",
@@ -14,7 +14,7 @@ Authors@R:
 Author: Wei Liu [aut, cre], Qingzhi Zhong [aut]
 Maintainer: Wei Liu <liuweideng@gmail.com>
 Description: A covariate-augmented overdispersed Poisson factor model is proposed to jointly perform a high-dimensional Poisson factor analysis and estimate a large coefficient matrix for overdispersed count data.
-    More details can be referred to Liu et al. (2024) <doi:10.48550/arXiv.2402.15071>.
+    More details can be referred to Liu et al. (2024) <doi:10.1093/biomtc/ujae031>.
 License: GPL-3
 Depends: 
     irlba,
